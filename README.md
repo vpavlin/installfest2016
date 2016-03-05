@@ -42,7 +42,7 @@ sudo vagrant ssh
 
 ### Get rootfs
 
-## Fedora
+#### Fedora
 
 ```
 curl -O https://kojipkgs.fedoraproject.org//work/tasks/5140/13225140/Fedora-Docker-Base-24-20160304.0.x86_64.tar.xz
@@ -50,15 +50,17 @@ tar xJf Fedora-Docker-Base-24-20160304.0.x86_64.tar.xz
 mkdir rootfs
 cd rootfs
 tar xJf ../6ade26bbe019a71c1fa18976f6a2c9e398c8a289e053eb9ed55b0044f064ffde/layer.tar.xz
+cd ~
 ```
 
-## FreeBSD
+#### FreeBSD
 
 ```
 fetch ftp://ftp.freebsd.org/pub/FreeBSD/releases/amd64/10.1-RELEASE/base.txz
 mkdir rootfs
 cd rootfs
 tar xJf base.txz
+cd ~
 ```
 ##Demos
 
@@ -75,8 +77,71 @@ more /etc/os-release | grep PRETTY
 
 ### LXC
 
+```
+sudo dnf -y install lxc lxc-extra lxc-templates
+sudo lxc-create -n test -P rootfs/ -t none
+sudo lxc-start -n test -- bash
+```
+
 ### systemd-nspawn
+
+```
+sudo systemd-nspawn -D rootfs/ bash
+```
 
 ### Docker
 
+Everybody knows this, right?;)
+
 ### runc
+
+```
+sudo dnf -y install runc
+
+runc spec > config.json
+sudo runc --root $PWD/rootfs
+```
+### Namespaces
+
+#### Mount
+
+```
+mkdir /tmp/test
+mount --bind /tmp/test /media/
+echo "Hello World" > /media/hello.txt
+more /media/hello.txt
+more /tmp/test/hello.txt
+```
+
+##### Pivot Root
+
+```
+sudo unshare -m -p -i -n -u --fork --mount-proc bash
+root=/home/vagrant/rootfs
+mkdir $root/.pivot
+mount --bind $root $root
+pivot_root $root $root/.pivot
+cd /
+exec bash
+rpm -q bash
+```
+
+
+#### UTS
+
+#### IPC
+
+#### PID
+
+#### Network
+
+#### User
+
+### Cgroups
+
+```
+sudo sytemd-cgls
+sudo systemd-nspawn --slice=test.slice -D rootfs/ bash
+sudo systemd-cgls | grep -A 1 -B 1 machine-rootfs\.scope
+```
+
