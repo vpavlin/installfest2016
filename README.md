@@ -107,8 +107,17 @@ sudo runc --root $PWD/rootfs
 
 ```
 mkdir /tmp/test
+sudo unshare -m bash
 mount --bind /tmp/test /media/
 echo "Hello World" > /media/hello.txt
+mount | grep media
+more /media/hello.txt
+```
+
+In second terminal sshed to the VM try
+
+```
+mount | grep media
 more /media/hello.txt
 more /tmp/test/hello.txt
 ```
