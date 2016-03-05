@@ -113,7 +113,17 @@ more /media/hello.txt
 more /tmp/test/hello.txt
 ```
 
-##### Pivot Root
+#### UTS
+
+#### IPC
+
+#### PID
+
+#### Network
+
+#### User
+
+#### Pivot Root
 
 ```
 sudo unshare -m -p -i -n -u --fork --mount-proc bash
@@ -125,17 +135,6 @@ cd /
 exec bash
 rpm -q bash
 ```
-
-
-#### UTS
-
-#### IPC
-
-#### PID
-
-#### Network
-
-#### User
 
 ### Cgroups
 
