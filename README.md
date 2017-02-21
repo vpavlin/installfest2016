@@ -4,6 +4,8 @@
 
 Demos for my InstallFest 2016 talk
 
+https://youtu.be/rTIjheXbwE8?list=PLub6xBWO8gV_Mr-UuxrHcfUbuGv5n_N5g
+
 ##Preparations
 
 I am using Vagrant, you can too.
@@ -45,11 +47,11 @@ sudo vagrant ssh
 #### Fedora
 
 ```
-curl -O https://kojipkgs.fedoraproject.org//work/tasks/5140/13225140/Fedora-Docker-Base-24-20160304.0.x86_64.tar.xz
-tar xJf Fedora-Docker-Base-24-20160304.0.x86_64.tar.xz
+curl -O https://kojipkgs.fedoraproject.org//packages/Fedora-Docker-Base/25/20170221.0/images/Fedora-Docker-Base-25-20170221.0.x86_64.tar.xz
+tar xJf Fedora-Docker-Base-25-20170221.0.x86_64.tar.xz
 mkdir rootfs
 cd rootfs
-tar xJf ../6ade26bbe019a71c1fa18976f6a2c9e398c8a289e053eb9ed55b0044f064ffde/layer.tar.xz
+tar xf ../5486f867eebad72e716d0c4ed1c278fbc6324f05315a0594738dc06e35e7f7ca/layer.tar
 cd ~
 ```
 
@@ -75,6 +77,14 @@ more /etc/os-release | grep PRETTY
 
 ### BSD Jails
 
+```
+uname -a
+sudo vi /etc/jail.conf
+sudo jail -c installfest
+uname -a
+#more /etc/sysctl.conf
+```
+
 ### LXC
 
 ```
@@ -98,8 +108,9 @@ Everybody knows this, right?;)
 ```
 sudo dnf -y install runc
 
-runc spec > config.json
-sudo runc --root $PWD/rootfs
+runc spec
+more config.json
+sudo runc start some-container
 ```
 ### Namespaces
 
@@ -124,13 +135,75 @@ more /tmp/test/hello.txt
 
 #### UTS
 
+```
+sudo unshare -u bash
+hostname
+sysctl -q -w kernel.hostname="installfest"
+```
+
+In second terminal sshed to the VM try
+
+```
+hostname
+```
+
 #### IPC
+
+```
+sudo unshare -i bash
+ipcs
+ipcmk -M 20
+ipcs
+```
+
+In second terminal sshed to the VM try
+
+```
+ipcs
+```
 
 #### PID
 
+```
+sudo unshare -p --fork bash -c 'sleep 100000 &
+bash'
+ps
+```
+
+Whaaat? How come it's not 1 and 2, but some crazy number? Because ps uses `/proc`
+
+```
+sudo unshare -p --fork --mount-proc bash -c 'sleep 100000 &
+bash'
+ps aux
+```
+
+Better, in second terminal sshed to the VM try
+
+```
+ps aux | grep sleep 1000
+```
+
 #### Network
 
+```
+sudo unshare -n bash
+ip a
+```
+
 #### User
+
+```
+unshare -U -r
+echo "Ahoj" > aaa
+ls -la aaa
+```
+
+In second terminal sshed to the VM try
+
+```
+ls -la aaa
+```
 
 #### Pivot Root
 
